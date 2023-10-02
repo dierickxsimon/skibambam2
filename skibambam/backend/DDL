@@ -1,0 +1,100 @@
+CREATE SCHEMA `learningffmdb` ;
+
+CREATE TABLE `learningffmdb`.`athlete` (
+  `id_athlete` INT NOT NULL AUTO_INCREMENT,
+  `first_name` VARCHAR(45) NULL,
+  `name` VARCHAR(45) NULL,
+  `max_hr` INT NULL,
+  `rest_hr` INT NULL,
+  `vo2max` FLOAT NULL,
+  PRIMARY KEY (`id_athletes`));
+
+CREATE TABLE `learningffmdb`.`training` (
+  `id_training` INT NOT NULL AUTO_INCREMENT,
+  `id_athlete` INT NULL,
+  `timestamp` DATETIME NULL,
+  `name` VARCHAR(255) NULL,
+  PRIMARY KEY (`id_training`),
+  INDEX `id_athlete_idx` (`id_athlete` ASC) VISIBLE,
+  CONSTRAINT `id_athlete`
+    FOREIGN KEY (`id_athlete`)
+    REFERENCES `learningffmdb`.`athletes` (`id_athletes`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+CREATE TABLE `learningffmdb`.`trainingloadtypes` (
+  `id_trainingloadtypes` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(45) NULL,
+  PRIMARY KEY (`id_trainingloadtypes`));
+
+
+CREATE TABLE `learningffmdb`.`ffmparameters` (
+  `id_ffmparameters` INT NOT NULL AUTO_INCREMENT,
+  `id_traingloadtypes` INT NULL,
+  `id_athlete` INT NULL,
+  `k1` DOUBLE NULL,
+  `k2` DOUBLE NULL,
+  `tau1` DOUBLE NULL,
+  `tau2` DOUBLE NULL,
+  PRIMARY KEY (`id_ffmparameters`),
+  INDEX `id_trainingloadtypes_idx` (`id_traingloadtypes` ASC) VISIBLE,
+  INDEX `id_athlete_idx` (`id_athlete` ASC) VISIBLE,
+  CONSTRAINT `id_trainingloadtypes_to_ffm_parameters`
+    FOREIGN KEY (`id_traingloadtypes`)
+    REFERENCES `learningffmdb`.`trainingloadtypes` (`id_trainingloadtypes`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `id_athlete_to_ffm_parameters`
+    FOREIGN KEY (`id_athlete`)
+    REFERENCES `learningffmdb`.`athletes` (`id_athletes`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+
+CREATE TABLE `learningffmdb`.`trainingload` (
+  `id_trainingload` INT NOT NULL AUTO_INCREMENT,
+  `id_training` INT NULL,
+  `id_trainingloadtypes` INT NULL,
+  `tlvalue` DOUBLE NULL,
+  PRIMARY KEY (`id_trainingload`),
+  INDEX `id_training_to_traingload_idx` (`id_training` ASC) VISIBLE,
+  INDEX `id_trainigloadtype_to_trainingload_idx` (`id_trainingloadtypes` ASC) VISIBLE,
+  CONSTRAINT `id_training_to_traingload`
+    FOREIGN KEY (`id_training`)
+    REFERENCES `learningffmdb`.`training` (`id_training`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `id_trainigloadtype_to_trainingload`
+    FOREIGN KEY (`id_trainingloadtypes`)
+    REFERENCES `learningffmdb`.`trainingloadtypes` (`id_trainingloadtypes`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+CREATE TABLE `learningffmdb`.`trainingdata` (
+  `id_trainingdata` INT NOT NULL AUTO_INCREMENT,
+  `id_training` INT NULL,
+  `id_athlete` INT NULL,
+  `timestamp` DATETIME NULL,
+  `position_lat` DOUBLE NULL,
+  `position_long` DOUBLE NULL,
+  `distance` DOUBLE NULL,
+  `enhanced_altitude` DOUBLE NULL,
+  `enhanced_speed` DOUBLE NULL,
+  `speed` DOUBLE NULL,
+  `temperature` INT NULL,
+  `heart_rate` INT NULL,
+  `cadence` INT NULL,
+  `fractional_cadance` VARCHAR(100) NULL,
+  PRIMARY KEY (`id_trainingdata`),
+  INDEX `id_training_to_trainingdata_idx` (`id_training` ASC) VISIBLE,
+  INDEX `id_athlete_to_trainingdata_idx` (`id_athlete` ASC) VISIBLE,
+  CONSTRAINT `id_training_to_trainingdata`
+    FOREIGN KEY (`id_training`)
+    REFERENCES `learningffmdb`.`training` (`id_training`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `id_athlete_to_trainingdata`
+    FOREIGN KEY (`id_athlete`)
+    REFERENCES `learningffmdb`.`athlete` (`id_athlete`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
